@@ -1,0 +1,6 @@
+{
+  "globalDependencies": {
+    "superagent": "registry:dt/superagent#2.0.0+20160906143408",
+    "uikit": "registry:dt/uikit#2.23.0+20160317120654"
+  }
+}
