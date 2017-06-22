@@ -2,7 +2,7 @@ import * as React from "react";
 import axios from 'axios';
 
 interface LoginFormState { username: string; password: string; }
-interface LoginFormProps { usernameLabel?: string, passwordLabel?: string, loginButtonLabel?: string }
+interface LoginFormProps { usernameLabel?: string, passwordLabel?: string, loginButtonLabel?: string, handleSubmit: any}
 
 export class LoginForm extends React.Component<LoginFormProps, LoginFormState>{
     state: LoginFormState;
@@ -44,7 +44,8 @@ export class LoginForm extends React.Component<LoginFormProps, LoginFormState>{
         this.setState(this.state);
     }
     handleSubmit(event: any) {
-        console.log(this.state);
+        event.preventDefault();
+        this.props.handleSubmit(this.state.username, this.state.password);
         /*let config = {
             baseURL: "http://api.argos.drev.io",
             withCredentials: true,
@@ -66,7 +67,7 @@ export class LoginForm extends React.Component<LoginFormProps, LoginFormState>{
         }).then((response) => {
             console.log(response.data);
         });*/
-        event.preventDefault();
+        
     }
     render() {
         return <form className="row loginBody" onSubmit={this.handleSubmit}>
