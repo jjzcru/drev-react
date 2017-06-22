@@ -2,44 +2,50 @@ import * as React from "react";
 import axios from 'axios';
 
 interface LoginFormState { username: string; password: string; }
-interface LoginFormProps { usernamePlaceholder?: string, passwordPlaceholder?: string }
+interface LoginFormProps { usernameLabel?: string, passwordLabel?: string, loginButtonLabel?: string }
 
 export class LoginForm extends React.Component<LoginFormProps, LoginFormState>{
     state: LoginFormState;
-    usernamePlaceholder: string;
-    passwordPlaceholder: string;
-    constructor(props: LoginFormProps){
+    usernameLabel: string;
+    passwordLabel: string;
+    loginButtonLabel: string;
+    constructor(props: LoginFormProps) {
         super(props);
         this.state = {
             username: "",
             password: ""
         };
 
-        this.usernamePlaceholder = "Username";
-        if(props.usernamePlaceholder){
-            this.usernamePlaceholder = props.usernamePlaceholder;
+        this.usernameLabel = "Username";
+        if (props.usernameLabel) {
+            this.usernameLabel = props.usernameLabel;
         }
 
-        this.passwordPlaceholder = "Password";
-        if(props.passwordPlaceholder){
-            this.passwordPlaceholder = props.passwordPlaceholder;
+        this.passwordLabel = "Password";
+        if (props.passwordLabel) {
+            this.passwordLabel = props.passwordLabel;
+        }
+
+        this.loginButtonLabel = "Login";
+        if (props.loginButtonLabel) {
+            this.loginButtonLabel = props.loginButtonLabel;
         }
 
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-    handleUsernameChange(event:any) {
+    handleUsernameChange(event: any) {
         this.state.username = event.target.value;
         this.setState(this.state);
     }
-    handlePasswordChange(event:any) {
+    handlePasswordChange(event: any) {
         this.state.password = event.target.value;
         this.setState(this.state);
     }
-    handleSubmit(event:any) {
+    handleSubmit(event: any) {
         console.log(this.state);
-        let config = {
+        /*let config = {
             baseURL: "http://api.argos.drev.io",
             withCredentials: true,
             headers: {
@@ -57,25 +63,23 @@ export class LoginForm extends React.Component<LoginFormProps, LoginFormState>{
                 username: 'root',
                 password: 'RevoSoft'
             }
-        }).then((response)=>{
+        }).then((response) => {
             console.log(response.data);
-        });
+        });*/
         event.preventDefault();
     }
     render() {
-        return <form className="uk-panel uk-panel-box uk-form" onSubmit={this.handleSubmit}>
-            <div className="uk-form-row">
-                <input className="uk-width-1-1 uk-form-large" value={this.state.username} onChange={this.handleUsernameChange} type="text" placeholder={this.usernamePlaceholder}/>
+        return <form className="row loginBody" onSubmit={this.handleSubmit}>
+            <label>{this.usernameLabel}</label>
+            <input className="form-control" value={this.state.username} onChange={this.handleUsernameChange} type="text" required/>
+            <br />
+            <label>{this.passwordLabel}</label>
+            <input className="form-control" value={this.state.password} onChange={this.handlePasswordChange} type="text" required/>
+            <br />
+            <div className="row" style={{ textAlign: "center" }}>
+                <button className="btn btn-argos" type="submit"><strong>{this.loginButtonLabel}</strong></button>
             </div>
-            <div className="uk-form-row">
-                <input className="uk-width-1-1 uk-form-large"  value={this.state.password} onChange={this.handlePasswordChange} type="password"  placeholder={this.passwordPlaceholder}/>
-            </div>
-            <div className="uk-form-row">
-                <button className="uk-width-1-1 uk-button uk-button-primary uk-button-small" type="submit">Login</button>
-            </div>
-            <div className="uk-form-row uk-text-small">
-                <a className="uk-float-right uk-link uk-link-muted" href="#">Forgot Password?</a>
-            </div>
+
         </form>;
     }
 }

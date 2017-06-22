@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "build:watch": "webpack --watch",
-    "serve": "webpack-dev-server --watch-poll"
+    "serve": "webpack-dev-server --watch-poll",
+    "postinstall" : "typings install"
   },
   "repository": {
     "type": "git",
@@ -42,7 +43,6 @@
     "react-hot-loader": "^1.3.1",
     "retyped-uikit-tsd-ambient": "^2.23.0-0",
     "source-map-loader": "^0.1.5",
-    "tsd": "^0.6.5",
     "typescript": "^2.1.4",
     "webpack": "^1.14.0",
     "webpack-hot-middleware": "^2.13.2"
