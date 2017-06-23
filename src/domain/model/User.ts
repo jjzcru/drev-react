@@ -1,4 +1,4 @@
-export class UserModel {
+export class User {
     private username: string;
     private name: string;
     private email: string;
@@ -10,35 +10,35 @@ export class UserModel {
         this.role = '';
     }
 
-    setUsername(username: string) {
+    public setUsername(username: string) {
         this.username = username;
     }
 
-    getUsername(): string {
+    public getUsername(): string {
         return this.username;
     }
 
-    setName(name: string) {
+    public setName(name: string) {
         this.name = name;
     }
 
-    getName(): string {
+    public getName(): string {
         return this.name;
     }
 
-    setEmail(email: string) {
+    public setEmail(email: string) {
         this.email = email;
     }
 
-    getEmail(): string {
+    public getEmail(): string {
         return this.email;
     }
 
-    setRole(role: string) {
+    public setRole(role: string) {
         this.role = role;
     }
 
-    getRole(): string {
+    public getRole(): string {
         return this.role;
     }
 }

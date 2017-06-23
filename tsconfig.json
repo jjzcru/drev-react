@@ -1,16 +1,20 @@
 {
-  "compileOnSave": true,
-  "compilerOptions": {
-    "outDir": "./dist",
-    "sourceMap": true,
-    "noImplicitAny": true,
-    "module": "commonjs",
-    "target": "es5",
-    "jsx": "react",
-    "rootDir": ".",
-    "watch": true
-  },
-  "include": [
-    "./src/**/*/"
-  ]
+    "compileOnSave": true,
+    "compilerOptions": {
+        "outDir": "./dist",
+        "sourceMap": true,
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "es2015",
+        "jsx": "react",
+        "rootDir": ".",
+        "watch": true
+    },
+    "include": [
+        "./src/**/*/"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }

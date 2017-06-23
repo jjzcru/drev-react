@@ -1,20 +1,17 @@
 import * as React from "react";
 import axios from 'axios';
 
-interface LoginFormState { username: string; password: string; }
 interface LoginFormProps { usernameLabel?: string, passwordLabel?: string, loginButtonLabel?: string, handleSubmit: any}
 
-export class LoginForm extends React.Component<LoginFormProps, LoginFormState>{
-    state: LoginFormState;
+export class LoginForm extends React.Component<LoginFormProps, any>{
     usernameLabel: string;
     passwordLabel: string;
     loginButtonLabel: string;
+
+    username: string = '';
+    password: string = '';
     constructor(props: LoginFormProps) {
         super(props);
-        this.state = {
-            username: "",
-            password: ""
-        };
 
         this.usernameLabel = "Username";
         if (props.usernameLabel) {
@@ -35,17 +32,21 @@ export class LoginForm extends React.Component<LoginFormProps, LoginFormState>{
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-    handleUsernameChange(event: any) {
-        this.state.username = event.target.value;
-        this.setState(this.state);
+
+
+    private handleUsernameChange(event: any) {
+        this.username = event.target.value;
     }
-    handlePasswordChange(event: any) {
-        this.state.password = event.target.value;
-        this.setState(this.state);
+
+    private handlePasswordChange(event: any) {
+        this.password = event.target.value;
     }
-    handleSubmit(event: any) {
+    
+    private handleSubmit(event: any) {
         event.preventDefault();
-        this.props.handleSubmit(this.state.username, this.state.password);
+        console.log(this.refs.tshirt);
+        this.props.handleSubmit(this.username, this.password);
+        
         /*let config = {
             baseURL: "http://api.argos.drev.io",
             withCredentials: true,
@@ -69,18 +70,18 @@ export class LoginForm extends React.Component<LoginFormProps, LoginFormState>{
         });*/
         
     }
+    
     render() {
         return <form className="row loginBody" onSubmit={this.handleSubmit}>
             <label>{this.usernameLabel}</label>
-            <input className="form-control" value={this.state.username} onChange={this.handleUsernameChange} type="text" required/>
+            <input className="form-control" onChange={this.handleUsernameChange} ref="tshirt" type="text" required/>
             <br />
             <label>{this.passwordLabel}</label>
-            <input className="form-control" value={this.state.password} onChange={this.handlePasswordChange} type="text" required/>
+            <input className="form-control" onChange={this.handlePasswordChange} type="password" required/>
             <br />
             <div className="row" style={{ textAlign: "center" }}>
                 <button className="btn btn-argos" type="submit"><strong>{this.loginButtonLabel}</strong></button>
             </div>
-
         </form>;
     }
 }
