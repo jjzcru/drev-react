@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Subscriber } from '@reactivex/rxjs';
-import { LoginForm } from './LoginForm';
-import { RevoAlert } from '../shared/RevoAlert';
-import { AuthenticateUseCase } from '../../../domain/interactors/AuthenticateUseCase';
-import { UserModel } from '../../model/UserModel';
-import { UserModelDataMapper } from "../../model/mapper/UserModelDataMapper";
-import { User } from "../../../domain/model/User";
+import { LoginForm } from '../components/Login/LoginForm';
+import { RevoAlert } from '../components/shared/RevoAlert';
+import { AuthenticateUseCase } from '../../domain/interactors/AuthenticateUseCase';
+import { UserModel } from '../model/UserModel';
+import { UserModelDataMapper } from '../model/mapper/UserModelDataMapper';
+import { User } from '../../domain/model/User';
 
-export class LoginComponent extends React.Component<any, any>{
+export class LoginView extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -19,10 +19,7 @@ export class LoginComponent extends React.Component<any, any>{
         this.closeAlert = this.closeAlert.bind(this);
     }
 
-    public authenticate(username: string, password: string) {
-        console.log("Username: " + username);
-        console.log("Password: " + password);
-
+    private authenticate(username: string, password: string) {
         let authenticateUseCase = new AuthenticateUseCase();
         authenticateUseCase.setUsername(username);
         authenticateUseCase.setPassword(password);
@@ -33,31 +30,32 @@ export class LoginComponent extends React.Component<any, any>{
                 userModel = UserModelDataMapper.convert(user);
             },
             (err) => {
-               this.setState({error: true, message: err.message});
+                this.setState({ error: true, message: err.message });
             },
             () => {
-                console.log('Este es el modelo');
+                // Here i handle the authentication response to go to dashboard
                 console.log(userModel);
             }));
     }
 
-    public closeAlert(){
-        this.setState({error: false});
+    private closeAlert() {
+        this.setState({ error: false });
     }
 
-    public render() {
+    render() {
         return (
-            <div className="col-md-4 col-md-offset-4">
-                <div className="row loginHeader" style={{ textAlign: "center" }}>
-                    <img src="src/presentation/assets/img/argos.jpg" />
+            <div className='col-md-4 col-md-offset-4'>
+                <div className='row loginHeader' style={{ textAlign: 'center' }}>
+                    <img src='src/presentation/assets/img/argos.jpg' />
                 </div>
                 <LoginForm
-                    usernameLabel={"Usuario 2"}
-                    passwordLabel={"Contraseña"}
-                    loginButtonLabel={"Iniciar sesion"}
+                    usernameLabel={'Usuario'}
+                    passwordLabel={'Contraseña'}
+                    loginButtonLabel={'Iniciar sesion'}
                     onSubmit={this.authenticate}
                 />
-                <RevoAlert show={this.state.error} title={'Error'} message={this.state.message} closeAlert={this.closeAlert}/>
+                <RevoAlert show={this.state.error} title={'Error'} message={this.state.message}
+                    closeAlert={this.closeAlert} />
             </div>
         );
     }

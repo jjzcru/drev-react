@@ -1,17 +1,24 @@
-import * as React from "react";
+import * as React from 'react';
 import SweetAlert from 'sweetalert-react';
 
-export class AlertComponent extends React.Component<any, any>{
+interface AlertProps {
+    show: boolean;
+    title: string;
+    message: string;
+    closeAlert: any;
+}
+
+export class RevoAlert extends React.Component<AlertProps, undefined> {
     constructor(props) {
         super(props);
-        this.state = { show: props.show, message: props.message, title: props.title };
         this.closeAlert = this.closeAlert.bind(this);
     }
-    closeAlert() {
+
+    private closeAlert() {
         this.props.closeAlert();
     }
-    render() {
-        console.log(this.state);
+
+    public render() {
         return (
             <div>
                 <SweetAlert

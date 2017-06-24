@@ -1,55 +1,56 @@
 {
-  "name": "drev",
-  "version": "1.0.0",
-  "description": "Drev software implementation in react",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "build:watch": "webpack --watch",
-    "serve": "webpack-dev-server --watch-poll",
-    "postinstall": "typings install"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://jjzcru@bitbucket.org/revosoftpa/drev.react.git"
-  },
-  "keywords": [
-    "react"
-  ],
-  "author": "Jose J. Cruz Torres",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/revosoftpa/drev.react#readme",
-  "dependencies": {
-    "@reactivex/rxjs": "^5.4.1",
-    "axios": "^0.15.3",
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
-    "rxjs": "^5.0.0-rc.5",
-    "superagent": "^3.1.0",
-    "sweetalert-react": "^0.4.10",
-    "ts-loader": "^1.3.3",
-    "typescript": "^2.1.4",
-    "uikit": "^2.27.2",
-    "webpack": "^1.14.0"
-  },
-  "devDependencies": {
-    "@types/node": "^6.0.46",
-    "@types/react": "^0.14.54",
-    "@types/react-dom": "^0.14.19",
-    "@types/uikit": "^2.23.27",
-    "awesome-typescript-loader": "^3.0.0-beta.9",
-    "babel-core": "^6.20.0",
-    "babel-polyfill": "^6.23.0",
-    "babel-loader": "^6.2.9",
-    "babel-preset-es2015": "^6.24.0",
-    "babel-preset-es2016": "^6.22.0",
-    "html-webpack-plugin": "^2.24.1",
-    "react-hot-loader": "^1.3.1",
-    "retyped-uikit-tsd-ambient": "^2.23.0-0",
-    "source-map-loader": "^0.1.5",
-    "typescript": "^2.1.4",
-    "webpack": "^1.14.0",
-    "webpack-hot-middleware": "^2.13.2"
-  }
+    "name": "drev",
+    "version": "1.0.0",
+    "description": "Drev software implementation in react",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack",
+        "build:watch": "webpack --watch",
+        "serve": "webpack-dev-server --watch-poll",
+        "postinstall": "typings install"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://jjzcru@bitbucket.org/revosoftpa/drev.react.git"
+    },
+    "keywords": [
+        "react"
+    ],
+    "author": "Jose J. Cruz Torres",
+    "license": "ISC",
+    "homepage": "https://bitbucket.org/revosoftpa/drev.react#readme",
+    "dependencies": {
+        "@reactivex/rxjs": "^5.4.1",
+        "axios": "^0.15.3",
+        "react": "^15.4.1",
+        "react-dom": "^15.4.1",
+        "rxjs": "^5.0.0-rc.5",
+        "superagent": "^3.1.0",
+        "sweetalert-react": "^0.4.10",
+        "ts-loader": "^1.3.3",
+        "tslint": "^4.5.1",
+        "typescript": "^2.1.4",
+        "uikit": "^2.27.2",
+        "webpack": "^1.14.0"
+    },
+    "devDependencies": {
+        "@types/node": "^6.0.46",
+        "@types/react": "^0.14.54",
+        "@types/react-dom": "^0.14.19",
+        "@types/uikit": "^2.23.27",
+        "awesome-typescript-loader": "^3.0.0-beta.9",
+        "babel-core": "^6.20.0",
+        "babel-polyfill": "^6.23.0",
+        "babel-loader": "^6.2.9",
+        "babel-preset-es2015": "^6.24.0",
+        "babel-preset-es2016": "^6.22.0",
+        "html-webpack-plugin": "^2.24.1",
+        "react-hot-loader": "^1.3.1",
+        "retyped-uikit-tsd-ambient": "^2.23.0-0",
+        "source-map-loader": "^0.1.5",
+        "typescript": "^2.1.4",
+        "webpack": "^1.14.0",
+        "webpack-hot-middleware": "^2.13.2"
+    }
 }

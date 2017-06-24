@@ -1,5 +1,5 @@
-import {User} from './../../../domain/model/User';
-import {UserModel} from '../UserModel';
+import { User } from './../../../domain/model/User';
+import { UserModel } from '../UserModel';
 
 export class UserModelDataMapper {
     public static transform(userModel: UserModel): User {
