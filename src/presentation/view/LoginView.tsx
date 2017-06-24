@@ -51,7 +51,7 @@ export class LoginView extends React.Component<any, any> {
                 <LoginForm
                     usernameLabel={'Usuario'}
                     passwordLabel={'Contraseña'}
-                    loginButtonLabel={'Iniciar sesion'}
+                    loginButtonLabel={'Iniciar sesión'}
                     onSubmit={this.authenticate}
                 />
                 <RevoAlert show={this.state.error} title={'Error'} message={this.state.message}

@@ -4,7 +4,7 @@ import { HomeComponent } from './Home/HomeComponent';
 // 'HelloProps' describes the shape of props.
 // State is never set so we use the 'undefined' type.
 
-export class AppComponent extends React.Component<any, undefined>{
+export class AppComponent extends React.Component<any, undefined> {
     constructor(props: any) {
         super(props);
     }

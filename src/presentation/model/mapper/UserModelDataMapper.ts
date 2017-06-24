@@ -1,4 +1,4 @@
-import { User } from './../../../domain/model/User';
+import { User } from '../../../domain/model/User';
 import { UserModel } from '../UserModel';
 
 export class UserModelDataMapper {
@@ -11,10 +11,10 @@ export class UserModelDataMapper {
         return user;
     }
 
-    public static transformList(userModelssList: Array<UserModel>): Array<User> {
+    public static transformList(userModelsList: Array<UserModel>): Array<User> {
         let usersList: Array<User> = [];
 
-        userModelssList.forEach((userModel: UserModel) => {
+        userModelsList.forEach((userModel: UserModel) => {
             usersList.push(this.transform(userModel));
         });
 
