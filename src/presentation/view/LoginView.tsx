@@ -1,28 +1,22 @@
 import * as React from 'react';
-import SweetAlert from 'sweetalert-react';
 import { Subscriber } from '@reactivex/rxjs';
 import { LoginForm } from './LoginForm';
-import { AlertComponent } from './AlertComponent';
+import { RevoAlert } from '../shared/RevoAlert';
 import { AuthenticateUseCase } from '../../../domain/interactors/AuthenticateUseCase';
 import { UserModel } from '../../model/UserModel';
 import { UserModelDataMapper } from "../../model/mapper/UserModelDataMapper";
 import { User } from "../../../domain/model/User";
 
 export class LoginComponent extends React.Component<any, any>{
-    error:true;
     constructor(props: any) {
         super(props);
         this.state = {
             error: false,
             message: ''
         };
-        this.setComponentState = this.setComponentState.bind(this);
+
         this.authenticate = this.authenticate.bind(this);
         this.closeAlert = this.closeAlert.bind(this);
-    }
-
-    setComponentState(state) {
-        this.setState(state);
     }
 
     public authenticate(username: string, password: string) {
@@ -58,12 +52,12 @@ export class LoginComponent extends React.Component<any, any>{
                     <img src="src/presentation/assets/img/argos.jpg" />
                 </div>
                 <LoginForm
-                    usernameLabel={"Usuario"}
+                    usernameLabel={"Usuario 2"}
                     passwordLabel={"Contraseña"}
                     loginButtonLabel={"Iniciar sesion"}
-                    handleSubmit={this.authenticate}
+                    onSubmit={this.authenticate}
                 />
-                <AlertComponent show={this.state.error} title={'Error'} message={this.state.message} closeAlert={this.closeAlert}/>
+                <RevoAlert show={this.state.error} title={'Error'} message={this.state.message} closeAlert={this.closeAlert}/>
             </div>
         );
     }
