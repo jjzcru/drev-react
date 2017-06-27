@@ -36,8 +36,6 @@ export class UserDBImpl implements UserDB {
                 } else {
                     let users = JSON.parse(localStorage.getItem(this.KEY));
                     users.forEach((user) => {
-                        console.log(user);
-
                         let userEntity = new UserEntity();
                         userEntity.setUserID(user.UserID);
                         userEntity.setName(user.name);
