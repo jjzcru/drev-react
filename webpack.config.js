@@ -1,11 +1,11 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     context: path.join(__dirname, '/src'),
     entry: "./index.tsx",
     output: {
         filename: "app.js",
-        publicPath: 'http://localhost:1618/',
         path: __dirname + "/dist"
     },
     // Enable sourcemaps for debugging webpack's output.
@@ -13,8 +13,8 @@ module.exports = {
 
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        modulesDirectories: ['node_modules'],
-        extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
+	    modules: ['node_modules'],
+        extensions: [".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
     },
 
     module: {
@@ -28,7 +28,7 @@ module.exports = {
 
         ],
 
-        preLoaders: [
+        /*preLoaders: [
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             { test: /\.js$/, loader: "source-map-loader" },
             {
@@ -36,7 +36,7 @@ module.exports = {
                 exclude: /(node_modules)/,
                 loader: 'source-map'
             }
-        ]
+        ]*/
     },
 
     // When importing a module whose path matches one of the following, just
@@ -51,16 +51,15 @@ module.exports = {
     devServer: {
         hot: true,
         port: 1818,
-        inline: true,
-        watch: true
+        inline: true
     },
-    /*plugins: [
+    plugins: [
     	new HtmlWebpackPlugin({
     		title: 'Drev',
     		filename: 'index.html',
-    		template: './src/index.html',
+    		template: './index.html',
     		inject: true,
     		hash: true
     	})
-    ]*/
+    ]
 };

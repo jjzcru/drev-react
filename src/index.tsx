@@ -1,12 +1,13 @@
+// tslint:disable-next-line
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { LoginView } from './presentation/view/LoginView';
-import { AppComponent } from './presentation/components/App/AppComponent';
-var isLogin = false;
+import { MainComponent } from './presentation/components/Main/MainComponent';
+let  isLogin = true;
 if (isLogin) {
     ReactDOM.render(
-        <AppComponent />,
+        <MainComponent />,
         document.getElementById('app')
     );
 } else {

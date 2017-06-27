@@ -46,12 +46,12 @@ export class LoginView extends React.Component<any, any> {
         return (
             <div className='col-md-4 col-md-offset-4'>
                 <div className='row loginHeader' style={{ textAlign: 'center' }}>
-                    <img src='src/presentation/assets/img/argos.jpg' />
+                    <img src='/src/presentation/assets/img/argos.jpg' />
                 </div>
                 <LoginForm
                     usernameLabel={'Usuario'}
                     passwordLabel={'Contraseña'}
-                    loginButtonLabel={'Iniciar sesion'}
+                    loginButtonLabel={'Iniciar sesión'}
                     onSubmit={this.authenticate}
                 />
                 <RevoAlert show={this.state.error} title={'Error'} message={this.state.message}

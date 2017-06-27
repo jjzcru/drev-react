@@ -3,9 +3,9 @@ import { UseCase } from './UseCase';
 import { UserRepository } from '../repository/UserRepository';
 
 import {UserDataRepository} from '../../data/repository/UserDataRepository';
-export class AuthenticateUseCase extends UseCase {
-    private username: string = '';
-    private password: string = '';
+import {User} from "../model/User";
+export class AddUserUseCase extends UseCase {
+    private user: User;
 
     private userRepository: UserRepository;
 
@@ -15,15 +15,11 @@ export class AuthenticateUseCase extends UseCase {
         this.userRepository = userRepository;
     }
 
-    public setUsername(username: string) {
-        this.username = username;
-    }
-
-    public setPassword(password: string) {
-        this.password = password;
+    public setUser(user: User) {
+        this.user = user;
     }
 
     protected buildUseCaseObservable(): Observable<any> {
-        return this.userRepository.authenticate(this.username, this.password);
+        return this.userRepository.addUser(this.user);
     }
 }
