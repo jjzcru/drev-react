@@ -1,9 +1,12 @@
 import * as React from 'react';
+import * as _ from 'lodash';
 import { UserModel } from '../../../model/UserModel';
-import {AddUserUseCase} from '../../../../domain/interactors/AddUserUseCase';
-import {UserModelDataMapper} from '../../../model/mapper/UserModelDataMapper';
-import {Subscriber} from '@reactivex/rxjs';
-import {GetUsersUseCase} from '../../../../domain/interactors/GetUsersUseCase';
+import { AddUserUseCase } from '../../../../domain/interactors/AddUserUseCase';
+import { UserModelDataMapper } from '../../../model/mapper/UserModelDataMapper';
+import { Subscriber } from '@reactivex/rxjs';
+import { GetUsersUseCase } from '../../../../domain/interactors/GetUsersUseCase';
+import { DeleteUserUseCase } from '../../../../domain/interactors/DeleteUserUseCase';
+import { EditUserUseCase } from '../../../../domain/interactors/EditUserUseCase';
 
 interface UserContentProps {
     usersLabel?: string;
@@ -40,6 +43,12 @@ export class UserContent extends React.Component<UserContentProps, any> {
 
     private users: Array<UserModel>;
 
+    private getUsersUseCase: GetUsersUseCase;
+    private addUserUseCase: AddUserUseCase;
+    private editUserUseCase: EditUserUseCase;
+    private deleteUserUseCase: DeleteUserUseCase;
+
+
     constructor(props: UserContentProps) {
         super(props);
         this.usersLabel = this.props.usersLabel || 'Users';
@@ -59,8 +68,14 @@ export class UserContent extends React.Component<UserContentProps, any> {
         this.state = {
             users: [],
             userModal: undefined,
-            filterInput: ''
+            filterInput: '',
+            selectedUser: undefined
         };
+
+        this.getUsersUseCase = new GetUsersUseCase();
+        this.addUserUseCase = new AddUserUseCase();
+        this.editUserUseCase = new EditUserUseCase();
+        this.deleteUserUseCase = new DeleteUserUseCase();
 
         this.getUsers = this.getUsers.bind(this);
         this.onEditUser = this.onEditUser.bind(this);
@@ -77,8 +92,7 @@ export class UserContent extends React.Component<UserContentProps, any> {
 
     private getUsers() {
         let users = [];
-        let getUsersUseCase = new GetUsersUseCase();
-        getUsersUseCase.execute(Subscriber.create(
+        this.getUsersUseCase.execute(Subscriber.create(
             (user: any) => {
                 users.push(UserModelDataMapper.convert(user));
             },
@@ -87,16 +101,14 @@ export class UserContent extends React.Component<UserContentProps, any> {
             },
             () => {
                 this.users = users;
-                console.log(users);
-                this.setState({users: users});
+                this.setState({ users: users });
             }));
     }
 
     private onSaveUser(userModel) {
         let savedUser;
-        let addUserUseCase = new AddUserUseCase();
-        addUserUseCase.setUser(UserModelDataMapper.transform(userModel));
-        addUserUseCase.execute(Subscriber.create(
+        this.addUserUseCase.setUser(UserModelDataMapper.transform(userModel));
+        this.addUserUseCase.execute(Subscriber.create(
             (user: any) => {
                 savedUser = UserModelDataMapper.convert(user);
             },
@@ -104,9 +116,8 @@ export class UserContent extends React.Component<UserContentProps, any> {
                 console.log(err.message);
             },
             () => {
-                console.log(savedUser);
                 this.users.push(savedUser);
-                this.setState({users: this.users, filterInput: ''});
+                this.setState({ users: this.users, filterInput: '' });
             }));
     }
 
@@ -115,32 +126,76 @@ export class UserContent extends React.Component<UserContentProps, any> {
     }
 
     private onEditUser(index: number) {
-        // let user: UserModel = this.state.users[index];
+        let selectedUser = this.state.users[index];
+        console.log(selectedUser);
+        this.setState({ selectedUser: selectedUser });
+        this.forceUpdate();
+        console.log(this.state.selectedUser);
+        /*this.editUserUseCase.setUser(selectedUser.getUserID(), selectedUser);
+        this.editUserUseCase.execute(Subscriber.create(
+            () => {
+            },
+            (err) => {
+                console.log(err.message);
+            },
+            () => {
+                let userIndex = _.findIndex(this.users, {'UserID': selectedUser.getUserID()});
+                this.users[userIndex] = selectedUser;
+                this.setState({users: this.users, filterInput: ''});
+            }));*/
 
     }
 
     private onDeleteUser(index: number) {
-        console.log('Borro el usario: ' + index);
-        console.log(this.state.users[index]);
+        let UserID = this.state.users[index].getUserID();
+        this.deleteUserUseCase.setUserID(UserID);
+        this.deleteUserUseCase.execute(Subscriber.create(
+            () => {
+            },
+            (err) => {
+                console.log(err.message);
+            },
+            () => {
+                this.users.splice(_.findIndex(this.users, { 'UserID': UserID }), 1);
+                this.setState({ users: this.users, filterInput: '' });
+            }));
     }
 
     private onFilterChange(event) {
         let filterInput = event.target.value;
-        this.setState({filterInput: filterInput});
+        this.setState({ filterInput: filterInput });
         if (filterInput.trim() === '') {
-            this.setState({ users: this.users});
+            this.setState({ users: this.users });
         } else {
             let filteredUsers = this.users.filter((user: UserModel) => {
-                if (user.getName().includes(filterInput)) { return true; };
-                if (user.getLastName().includes(filterInput)) { return true; };
-                if (user.getUsername().includes(filterInput)) { return true; };
-                if (user.getEmail().includes(filterInput)) { return true; };
-                if (user.getRole().includes(filterInput)) { return true; };
-                if (user.getDepartment().includes(filterInput)) { return true; };
+                if (user.getName().includes(filterInput)) {
+                    return true;
+                }
+                ;
+                if (user.getLastName().includes(filterInput)) {
+                    return true;
+                }
+                ;
+                if (user.getUsername().includes(filterInput)) {
+                    return true;
+                }
+                ;
+                if (user.getEmail().includes(filterInput)) {
+                    return true;
+                }
+                ;
+                if (user.getRole().includes(filterInput)) {
+                    return true;
+                }
+                ;
+                if (user.getDepartment().includes(filterInput)) {
+                    return true;
+                }
+                ;
 
                 return false;
             });
-            this.setState({ users: filteredUsers});
+            this.setState({ users: filteredUsers });
         }
     }
 
@@ -155,14 +210,16 @@ export class UserContent extends React.Component<UserContentProps, any> {
                 <hr />
                 <div className='row'>
                     <div className='col-md-2 pull-right'>
-                        <input className='form-control' type='text' value={this.state.filterInput} onChange={this.onFilterChange}
+                        <input className='form-control' type='text' value={this.state.filterInput}
+                            onChange={this.onFilterChange}
                             placeholder={this.filterLabel} />
                     </div>
                 </div>
                 <br />
                 <section className='panel'>
                     <header className='panel-heading'> {this.usersLabel}
-                        <button className='btn btn-xs btn-success pull-right' data-toggle='modal' data-target='#userModal'>
+                        <button className='btn btn-xs btn-success pull-right' data-toggle='modal'
+                            data-target='#addUserModal'>
                             {this.addLabel}
                         </button>
                     </header>
@@ -190,6 +247,11 @@ export class UserContent extends React.Component<UserContentProps, any> {
                 <AddUserModal
                     modalTitle={'Agregar usuario'}
                     userModel={new UserModel()}
+                    onSave={this.onSaveUser}
+                    onCancel={this.onCancel} />
+                <EditUserModal
+                    modalTitle={'Editar usuario'}
+                    userModel={this.state.selectedUser}
                     onSave={this.onSaveUser}
                     onCancel={this.onCancel} />
             </section>
@@ -224,7 +286,8 @@ class DisplayUsers extends React.Component<DisplayUsersProps, undefined> {
                     <td>{user.getRole()}</td>
                     <td>{user.getDepartment()}</td>
                     <td>
-                        <button className='btn btn-sm btn-warning' data-id={index} onClick={this.onUserEdit} data-toggle='modal' data-target='#userModal'>
+                        <button className='btn btn-sm btn-warning' data-id={index} onClick={this.onUserEdit}
+                            data-toggle='modal' data-target='#editUserModal'>
                             <i className='fa fa-pencil' />
                         </button>
                     </td>
@@ -338,11 +401,12 @@ class AddUserModal extends React.Component<UserModalProps, UserModalState> {
 
     render() {
         return (
-            <div id='userModal' className='modal fade' role='dialog' aria-labelledby='myModalLabel'>
+            <div id='addUserModal' className='modal fade' role='dialog' aria-labelledby='myModalLabel'>
                 <div className='modal-dialog' role='document'>
                     <div className='modal-content'>
                         <div className='modal-header'>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span
+                                aria-hidden='true'>&times;</span></button>
                             <h4 className='modal-title' id='myModalLabel'>{this.modalTitle}</h4>
                         </div>
                         <div className='modal-body'>
@@ -350,27 +414,33 @@ class AddUserModal extends React.Component<UserModalProps, UserModalState> {
                                 <div className='col-md-12'>
                                     <form id='addUserForm' onSubmit={this.onSave}>
                                         <label>{this.nameLabel}:</label>
-                                        <input type='text' onChange={(e: any) => this.state.name = e.target.value} className='form-control' required />
+                                        <input type='text' onChange={(e: any) => this.state.name = e.target.value}
+                                            className='form-control' required />
                                         <br />
                                         <label>{this.lastNameLabel}:</label>
-                                        <input type='text' onChange={(e: any) => this.state.lastName = e.target.value} className='form-control' required />
+                                        <input type='text' onChange={(e: any) => this.state.lastName = e.target.value}
+                                            className='form-control' required />
                                         <br />
                                         <label>{this.usernameLabel}:</label>
-                                        <input type='text' className='form-control' onChange={(e: any) => this.state.username = e.target.value} required />
+                                        <input type='text' className='form-control'
+                                            onChange={(e: any) => this.state.username = e.target.value} required />
                                         <br />
                                         <label>{this.emailLabel}:</label>
-                                        <input type='email' className='form-control' onChange={(e: any) => this.state.email = e.target.value} required />
+                                        <input type='email' className='form-control'
+                                            onChange={(e: any) => this.state.email = e.target.value} required />
                                         <br />
                                         <label>{this.roleLabel}:</label>
-                                        <select className='form-control' onChange={(e: any) => this.state.role = e.target.value} required>
-                                            <option value=''>Seleccione un usuario: </option>
+                                        <select className='form-control'
+                                            onChange={(e: any) => this.state.role = e.target.value} required>
+                                            <option value=''>Seleccione un usuario:</option>
                                             <option value='user'>Usuario</option>
                                             <option value='admin'>Administrador</option>
                                             <option value='chief'>Jefe</option>
                                         </select>
                                         <br />
                                         <label>{this.departmentLabel}:</label>
-                                        <select className='form-control' onChange={(e: any) => this.state.department = e.target.value} required>
+                                        <select className='form-control'
+                                            onChange={(e: any) => this.state.department = e.target.value} required>
                                             <option value=''>Seleccione un Departamento</option>
                                             <option value='production'>Produccion</option>
                                         </select>
@@ -379,8 +449,10 @@ class AddUserModal extends React.Component<UserModalProps, UserModalState> {
                             </div>
                         </div>
                         <div className='modal-footer'>
-                            <button type='button' className='btn btn-default' data-dismiss='modal'>{this.cancelButtonLabel}</button>
-                            <button type='submit' className='btn btn-success' form='addUserForm'>{this.saveButtonLabel}</button>
+                            <button type='button' className='btn btn-default'
+                                data-dismiss='modal'>{this.cancelButtonLabel}</button>
+                            <button type='submit' className='btn btn-success'
+                                form='addUserForm'>{this.saveButtonLabel}</button>
                         </div>
                     </div>
                 </div>
@@ -407,29 +479,6 @@ class EditUserModal extends React.Component<UserModalProps, UserModalState> {
         super(props);
 
         this.modalTitle = this.props.modalTitle;
-        if (this.props.userModel === undefined || this.props.userModel === null) {
-            this.user = new UserModel();
-            this.state = {
-                name: '',
-                lastName: '',
-                username: '',
-                email: '',
-                role: '',
-                department: ''
-            };
-        } else {
-            this.user = this.props.userModel;
-            console.log('Estoy en el constructor');
-            console.log(this.user);
-            this.state = {
-                name: this.user.getName(),
-                lastName: this.user.getLastName(),
-                username: this.user.getUsername(),
-                email: this.user.getEmail(),
-                role: this.user.getRole(),
-                department: this.user.getDepartment()
-            };
-        }
 
         this.nameLabel = this.props.nameLabel || 'Name';
         this.lastNameLabel = this.props.lastNameLabel || 'Last Name';
@@ -440,8 +489,32 @@ class EditUserModal extends React.Component<UserModalProps, UserModalState> {
         this.cancelButtonLabel = this.props.cancelButtonLabel || 'Cancel';
         this.saveButtonLabel = this.props.saveButtonLabel || 'Save';
 
+        this.state = {
+            name: '',
+            lastName: '',
+            username: '',
+            email: '',
+            role: '',
+            department: ''
+        };
+
         this.onSave = this.onSave.bind(this);
         this.onCancel = this.onCancel.bind(this);
+    }
+
+    // tslint:disable-next-line
+    private componentDidMount() {
+        console.log('Llame al did mount');
+        console.log(this.props.userModel);
+    }
+
+
+    // tslint:disable-next-line
+    private componentWillReceiveProps(newProps) {
+        console.log('Llame al componentWillReceiveProps');
+        console.log(this.props.userModel);
+        /*this.setState({name: newProps.name});*/
+
     }
 
     private onChangeName(event) {
@@ -464,21 +537,24 @@ class EditUserModal extends React.Component<UserModalProps, UserModalState> {
 
     render() {
         return (
-            <div id='userModal' className='modal fade' role='dialog' aria-labelledby='myModalLabel'>
+            <div id='editUserModal' className='modal fade' role='dialog' aria-labelledby='myModalLabel'>
                 <div className='modal-dialog' role='document'>
                     <div className='modal-content'>
                         <div className='modal-header'>
-                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span
+                                aria-hidden='true'>&times;</span></button>
                             <h4 className='modal-title' id='myModalLabel'>{this.modalTitle}</h4>
                         </div>
                         <div className='modal-body'>
                             <div className='row'>
                                 <div className='col-md-12'>
                                     <label>{this.nameLabel}:</label>
-                                    <input type='text' value={this.state.name} onChange={this.onChangeName} className='form-control' />
+                                    <input type='text' value={this.state.name} onChange={this.onChangeName}
+                                        className='form-control' />
                                     <br />
                                     <label>{this.lastNameLabel}:</label>
-                                    <input type='text' value={this.state.lastName} onChange={this.onChangeLastName} className='form-control' />
+                                    <input type='text' value={this.state.lastName} onChange={this.onChangeLastName}
+                                        className='form-control' />
                                     <br />
                                     <label>{this.usernameLabel}:</label>
                                     <input type='text' className='form-control' />
@@ -503,8 +579,10 @@ class EditUserModal extends React.Component<UserModalProps, UserModalState> {
                             </div>
                         </div>
                         <div className='modal-footer'>
-                            <button type='button' className='btn btn-default' data-dismiss='modal'>{this.cancelButtonLabel}</button>
-                            <button type='button' className='btn btn-success' onClick={this.onSave}>{this.saveButtonLabel}</button>
+                            <button type='button' className='btn btn-default'
+                                data-dismiss='modal'>{this.cancelButtonLabel}</button>
+                            <button type='button' className='btn btn-success'
+                                onClick={this.onSave}>{this.saveButtonLabel}</button>
                         </div>
                     </div>
                 </div>

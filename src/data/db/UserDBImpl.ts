@@ -54,7 +54,7 @@ export class UserDBImpl implements UserDB {
                     observer.complete();
                 }
             } catch (e) {
-                observer.error(e.message);
+                observer.error(new Error(e.message));
             }
         });
     }
@@ -79,7 +79,7 @@ export class UserDBImpl implements UserDB {
                 localStorage.setItem(this.KEY, JSON.stringify(usersEntities));
                 observer.complete();
             } catch (e) {
-                observer.error(e.message);
+                observer.error(new Error(e.message));
             }
         });
     }
@@ -104,7 +104,7 @@ export class UserDBImpl implements UserDB {
                 localStorage.setItem(this.KEY, JSON.stringify(usersEntities));
                 observer.complete();
             } catch (e) {
-                observer.error(e.message);
+                observer.error(new Error(e.message));
             }
         });
     }
