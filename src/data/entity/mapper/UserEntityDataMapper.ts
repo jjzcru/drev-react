@@ -4,10 +4,13 @@ import {UserEntity} from '../UserEntity';
 export class UserEntityDataMapper {
     public static transform(userEntity: UserEntity): User {
         let user = new User();
+        user.setUserID(userEntity.getUserID());
         user.setUsername(userEntity.getUsername());
         user.setName(userEntity.getName());
+        user.setLastName(userEntity.getLastName());
         user.setEmail(userEntity.getEmail());
         user.setRole(userEntity.getRole());
+        user.setDepartment(userEntity.getDepartment());
         return user;
     }
 
@@ -23,10 +26,13 @@ export class UserEntityDataMapper {
 
     public static convert(user: User): UserEntity {
         let userEntity = new UserEntity();
+        userEntity.setUserID(user.getUserID());
         userEntity.setUsername(user.getUsername());
         userEntity.setName(user.getName());
+        userEntity.setLastName(user.getLastName());
         userEntity.setEmail(user.getEmail());
         userEntity.setRole(user.getRole());
+        userEntity.setDepartment(user.getDepartment());
         return userEntity;
     }
 

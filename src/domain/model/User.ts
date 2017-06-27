@@ -1,13 +1,24 @@
 export class User {
+    private UserID: string;
     private username: string;
     private name: string;
+    private lastName: string;
     private email: string;
     private role: string;
+    private department: string;
     constructor() {
         this.username = '';
         this.name = '';
         this.email = '';
         this.role = '';
+    }
+
+    public setUserID(UserID: string) {
+        this.UserID = UserID;
+    }
+
+    public getUserID(): string {
+        return this.UserID;
     }
 
     public setUsername(username: string) {
@@ -26,6 +37,14 @@ export class User {
         return this.name;
     }
 
+    public setLastName(lastName: string) {
+        this.lastName = lastName;
+    }
+
+    public getLastName(): string {
+        return this.lastName;
+    }
+
     public setEmail(email: string) {
         this.email = email;
     }
@@ -40,5 +59,13 @@ export class User {
 
     public getRole(): string {
         return this.role;
+    }
+
+    public setDepartment(department: string) {
+        this.department = department;
+    }
+
+    public getDepartment(): string {
+        return this.department;
     }
 }

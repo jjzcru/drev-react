@@ -1,5 +1,9 @@
 import * as React from 'react';
 import { UserModel } from '../../../model/UserModel';
+import {AddUserUseCase} from '../../../../domain/interactors/AddUserUseCase';
+import {UserModelDataMapper} from '../../../model/mapper/UserModelDataMapper';
+import {Subscriber} from '@reactivex/rxjs';
+import {GetUsersUseCase} from '../../../../domain/interactors/GetUsersUseCase';
 
 interface UserContentProps {
     usersLabel?: string;
@@ -35,7 +39,6 @@ export class UserContent extends React.Component<UserContentProps, any> {
     private addLabel: string;
 
     private users: Array<UserModel>;
-    private displayUsers: Array<UserModel>;
 
     constructor(props: UserContentProps) {
         super(props);
@@ -53,36 +56,67 @@ export class UserContent extends React.Component<UserContentProps, any> {
 
         this.users = [];
 
-        let user = new UserModel();
-        user.setName('Jose');
-        user.setLastName('Jaen');
-        user.setUsername('jjaen');
-        user.setEmail('jjaen@revosoft.com.pa');
-        user.setRole('Usuario');
-        user.setDepartment('Produccion');
-        this.users.push(user);
-
-        user = new UserModel();
-        user.setName('Jose');
-        user.setLastName('Faraday');
-        user.setUsername('jfaraday');
-        user.setEmail('jfarady@revosoft.com.pa');
-        user.setRole('Chief');
-        user.setDepartment('Alimentacion');
-        this.users.push(user);
-
         this.state = {
-            users: this.users
+            users: [],
+            userModal: undefined,
+            filterInput: ''
         };
 
+        this.getUsers = this.getUsers.bind(this);
         this.onEditUser = this.onEditUser.bind(this);
         this.onDeleteUser = this.onDeleteUser.bind(this);
         this.onFilterChange = this.onFilterChange.bind(this);
+        this.onSaveUser = this.onSaveUser.bind(this);
+        this.onCancel = this.onCancel.bind(this);
+    }
+
+    // tslint:disable-next-line
+    private componentDidMount() {
+        this.getUsers();
+    }
+
+    private getUsers() {
+        let users = [];
+        let getUsersUseCase = new GetUsersUseCase();
+        getUsersUseCase.execute(Subscriber.create(
+            (user: any) => {
+                users.push(UserModelDataMapper.convert(user));
+            },
+            (err) => {
+                console.log(err);
+            },
+            () => {
+                this.users = users;
+                console.log(users);
+                this.setState({users: users});
+            }));
+    }
+
+    private onSaveUser(userModel) {
+        let savedUser;
+        let addUserUseCase = new AddUserUseCase();
+        addUserUseCase.setUser(UserModelDataMapper.transform(userModel));
+        addUserUseCase.execute(Subscriber.create(
+            (user: any) => {
+                savedUser = UserModelDataMapper.convert(user);
+            },
+            (err) => {
+                console.log(err.message);
+            },
+            () => {
+                console.log(savedUser);
+                this.users.push(savedUser);
+                this.setState({users: this.users, filterInput: ''});
+            }));
+    }
+
+    private onCancel() {
+        this.setState({ userModal: undefined });
     }
 
     private onEditUser(index: number) {
-        console.log('Edito el usario: ' + index);
-        console.log(this.state.users[index]);
+        // let user: UserModel = this.state.users[index];
+
     }
 
     private onDeleteUser(index: number) {
@@ -92,8 +126,9 @@ export class UserContent extends React.Component<UserContentProps, any> {
 
     private onFilterChange(event) {
         let filterInput = event.target.value;
+        this.setState({filterInput: filterInput});
         if (filterInput.trim() === '') {
-            this.setState({ users: this.users });
+            this.setState({ users: this.users});
         } else {
             let filteredUsers = this.users.filter((user: UserModel) => {
                 if (user.getName().includes(filterInput)) { return true; };
@@ -105,7 +140,7 @@ export class UserContent extends React.Component<UserContentProps, any> {
 
                 return false;
             });
-            this.setState({ users: filteredUsers });
+            this.setState({ users: filteredUsers});
         }
     }
 
@@ -120,15 +155,14 @@ export class UserContent extends React.Component<UserContentProps, any> {
                 <hr />
                 <div className='row'>
                     <div className='col-md-2 pull-right'>
-                        <input className='form-control' type='text' onChange={this.onFilterChange}
+                        <input className='form-control' type='text' value={this.state.filterInput} onChange={this.onFilterChange}
                             placeholder={this.filterLabel} />
                     </div>
                 </div>
                 <br />
                 <section className='panel'>
                     <header className='panel-heading'> {this.usersLabel}
-                        <button className='btn btn-xs btn-success pull-right' data-toggle='modal'
-                            data-target='#myModal'>
+                        <button className='btn btn-xs btn-success pull-right' data-toggle='modal' data-target='#userModal'>
                             {this.addLabel}
                         </button>
                     </header>
@@ -153,6 +187,11 @@ export class UserContent extends React.Component<UserContentProps, any> {
                         </table>
                     </div>
                 </section>
+                <AddUserModal
+                    modalTitle={'Agregar usuario'}
+                    userModel={new UserModel()}
+                    onSave={this.onSaveUser}
+                    onCancel={this.onCancel} />
             </section>
         );
     }
@@ -185,8 +224,9 @@ class DisplayUsers extends React.Component<DisplayUsersProps, undefined> {
                     <td>{user.getRole()}</td>
                     <td>{user.getDepartment()}</td>
                     <td>
-                        <button className='btn btn-sm btn-warning' data-id={index} onClick={this.onUserEdit}><i
-                            className='fa fa-pencil' /></button>
+                        <button className='btn btn-sm btn-warning' data-id={index} onClick={this.onUserEdit} data-toggle='modal' data-target='#userModal'>
+                            <i className='fa fa-pencil' />
+                        </button>
                     </td>
                     <td>
                         <button className='btn btn-sm btn-danger' data-id={index} onClick={this.onUserDelete}><i
@@ -200,6 +240,275 @@ class DisplayUsers extends React.Component<DisplayUsersProps, undefined> {
             <tbody>
                 {users}
             </tbody>
+        );
+    }
+}
+
+interface UserModalProps {
+    modalTitle: string;
+    userModel: UserModel;
+
+    nameLabel?: string;
+    lastNameLabel?: string;
+    usernameLabel?: string;
+    emailLabel?: string;
+    roleLabel?: string;
+    departmentLabel?: string;
+    cancelButtonLabel?: string;
+    saveButtonLabel?: string;
+
+    onSave: any;
+    onCancel: any;
+}
+
+interface UserModalState {
+    name: string;
+    lastName: string;
+    username: string;
+    email: string;
+    role: string;
+    department: string;
+}
+
+class AddUserModal extends React.Component<UserModalProps, UserModalState> {
+    private modalTitle: string;
+
+    private nameLabel?: string;
+    private lastNameLabel?: string;
+    private usernameLabel?: string;
+    private emailLabel?: string;
+    private roleLabel?: string;
+    private departmentLabel?: string;
+    private cancelButtonLabel?: string;
+    private saveButtonLabel?: string;
+
+
+    constructor(props: UserModalProps) {
+        super(props);
+
+        this.modalTitle = this.props.modalTitle;
+        this.state = {
+            name: '',
+            lastName: '',
+            username: '',
+            email: '',
+            role: '',
+            department: ''
+        };
+
+        this.nameLabel = this.props.nameLabel || 'Name';
+        this.lastNameLabel = this.props.lastNameLabel || 'Last Name';
+        this.usernameLabel = this.props.usernameLabel || 'Username';
+        this.emailLabel = this.props.emailLabel || 'Email';
+        this.roleLabel = this.props.roleLabel || 'Role';
+        this.departmentLabel = this.props.departmentLabel || 'Department';
+        this.cancelButtonLabel = this.props.cancelButtonLabel || 'Cancel';
+        this.saveButtonLabel = this.props.saveButtonLabel || 'Save';
+
+        this.onSave = this.onSave.bind(this);
+        this.onCancel = this.onCancel.bind(this);
+    }
+
+    private onSave(event) {
+        event.preventDefault();
+
+        let userModel = new UserModel();
+        userModel.setName(this.state.name);
+        userModel.setLastName(this.state.lastName);
+        userModel.setUsername(this.state.username);
+        userModel.setEmail(this.state.email);
+        userModel.setRole(this.state.role);
+        userModel.setDepartment(this.state.department);
+
+        this.setState({
+            name: '',
+            lastName: '',
+            username: '',
+            email: '',
+            role: '',
+            department: ''
+        });
+        this.props.onSave(userModel);
+    }
+
+    private onCancel(event) {
+        event.preventDefault();
+        this.props.onCancel();
+    }
+
+    render() {
+        return (
+            <div id='userModal' className='modal fade' role='dialog' aria-labelledby='myModalLabel'>
+                <div className='modal-dialog' role='document'>
+                    <div className='modal-content'>
+                        <div className='modal-header'>
+                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+                            <h4 className='modal-title' id='myModalLabel'>{this.modalTitle}</h4>
+                        </div>
+                        <div className='modal-body'>
+                            <div className='row'>
+                                <div className='col-md-12'>
+                                    <form id='addUserForm' onSubmit={this.onSave}>
+                                        <label>{this.nameLabel}:</label>
+                                        <input type='text' onChange={(e: any) => this.state.name = e.target.value} className='form-control' required />
+                                        <br />
+                                        <label>{this.lastNameLabel}:</label>
+                                        <input type='text' onChange={(e: any) => this.state.lastName = e.target.value} className='form-control' required />
+                                        <br />
+                                        <label>{this.usernameLabel}:</label>
+                                        <input type='text' className='form-control' onChange={(e: any) => this.state.username = e.target.value} required />
+                                        <br />
+                                        <label>{this.emailLabel}:</label>
+                                        <input type='email' className='form-control' onChange={(e: any) => this.state.email = e.target.value} required />
+                                        <br />
+                                        <label>{this.roleLabel}:</label>
+                                        <select className='form-control' onChange={(e: any) => this.state.role = e.target.value} required>
+                                            <option value=''>Seleccione un usuario: </option>
+                                            <option value='user'>Usuario</option>
+                                            <option value='admin'>Administrador</option>
+                                            <option value='chief'>Jefe</option>
+                                        </select>
+                                        <br />
+                                        <label>{this.departmentLabel}:</label>
+                                        <select className='form-control' onChange={(e: any) => this.state.department = e.target.value} required>
+                                            <option value=''>Seleccione un Departamento</option>
+                                            <option value='production'>Produccion</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='modal-footer'>
+                            <button type='button' className='btn btn-default' data-dismiss='modal'>{this.cancelButtonLabel}</button>
+                            <button type='submit' className='btn btn-success' form='addUserForm'>{this.saveButtonLabel}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
+class EditUserModal extends React.Component<UserModalProps, UserModalState> {
+    private modalTitle: string;
+
+    private nameLabel?: string;
+    private lastNameLabel?: string;
+    private usernameLabel?: string;
+    private emailLabel?: string;
+    private roleLabel?: string;
+    private departmentLabel?: string;
+    private cancelButtonLabel?: string;
+    private saveButtonLabel?: string;
+
+    private user: UserModel;
+
+    constructor(props: UserModalProps) {
+        super(props);
+
+        this.modalTitle = this.props.modalTitle;
+        if (this.props.userModel === undefined || this.props.userModel === null) {
+            this.user = new UserModel();
+            this.state = {
+                name: '',
+                lastName: '',
+                username: '',
+                email: '',
+                role: '',
+                department: ''
+            };
+        } else {
+            this.user = this.props.userModel;
+            console.log('Estoy en el constructor');
+            console.log(this.user);
+            this.state = {
+                name: this.user.getName(),
+                lastName: this.user.getLastName(),
+                username: this.user.getUsername(),
+                email: this.user.getEmail(),
+                role: this.user.getRole(),
+                department: this.user.getDepartment()
+            };
+        }
+
+        this.nameLabel = this.props.nameLabel || 'Name';
+        this.lastNameLabel = this.props.lastNameLabel || 'Last Name';
+        this.usernameLabel = this.props.usernameLabel || 'Username';
+        this.emailLabel = this.props.emailLabel || 'Email';
+        this.roleLabel = this.props.roleLabel || 'Role';
+        this.departmentLabel = this.props.departmentLabel || 'Department';
+        this.cancelButtonLabel = this.props.cancelButtonLabel || 'Cancel';
+        this.saveButtonLabel = this.props.saveButtonLabel || 'Save';
+
+        this.onSave = this.onSave.bind(this);
+        this.onCancel = this.onCancel.bind(this);
+    }
+
+    private onChangeName(event) {
+        this.user.setName(event.target.value);
+    }
+
+    private onChangeLastName(event) {
+        this.user.setLastName(event.target.value);
+    }
+
+    private onSave() {
+        console.log(this.user);
+        // this.props.onSave(user);
+    }
+
+    private onCancel(event) {
+        event.preventDefault();
+        this.props.onCancel();
+    }
+
+    render() {
+        return (
+            <div id='userModal' className='modal fade' role='dialog' aria-labelledby='myModalLabel'>
+                <div className='modal-dialog' role='document'>
+                    <div className='modal-content'>
+                        <div className='modal-header'>
+                            <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+                            <h4 className='modal-title' id='myModalLabel'>{this.modalTitle}</h4>
+                        </div>
+                        <div className='modal-body'>
+                            <div className='row'>
+                                <div className='col-md-12'>
+                                    <label>{this.nameLabel}:</label>
+                                    <input type='text' value={this.state.name} onChange={this.onChangeName} className='form-control' />
+                                    <br />
+                                    <label>{this.lastNameLabel}:</label>
+                                    <input type='text' value={this.state.lastName} onChange={this.onChangeLastName} className='form-control' />
+                                    <br />
+                                    <label>{this.usernameLabel}:</label>
+                                    <input type='text' className='form-control' />
+                                    <br />
+                                    <label>{this.emailLabel}:</label>
+                                    <input type='text' className='form-control' />
+                                    <br />
+                                    <label>{this.roleLabel}:</label>
+                                    <select className='form-control'>
+                                        <option></option>
+                                        <option>Usuario</option>
+                                        <option>Administrador</option>
+                                        <option>Jefe</option>
+                                    </select>
+                                    <br />
+                                    <label>{this.departmentLabel}:</label>
+                                    <select className='form-control'>
+                                        <option></option>
+                                        <option>Produccion</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='modal-footer'>
+                            <button type='button' className='btn btn-default' data-dismiss='modal'>{this.cancelButtonLabel}</button>
+                            <button type='button' className='btn btn-success' onClick={this.onSave}>{this.saveButtonLabel}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         );
     }
 }
