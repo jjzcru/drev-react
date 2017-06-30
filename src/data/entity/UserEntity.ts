@@ -8,6 +8,7 @@ export class UserEntity {
     private department: string;
     private createdAt: Date;
     private updatedAt: Date;
+
     constructor() {
         this.username = '';
         this.name = '';

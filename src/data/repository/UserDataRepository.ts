@@ -1,4 +1,6 @@
+import 'babel-polyfill';
 import { Observable } from '@reactivex/rxjs';
+import * as uuid from 'uuid/v4';
 
 import { UserRepository } from '../../domain/repository/UserRepository';
 import {User} from '../../domain/model/User';
@@ -6,11 +8,19 @@ import {UserEntity} from '../entity/UserEntity';
 import {UserEntityDataMapper} from '../entity/mapper/UserEntityDataMapper';
 import {UserDB} from '../db/UserDB';
 import {UserDBImpl} from '../db/UserDBImpl';
+import {TokenDB} from '../db/TokenDB';
+import {TokenDBImpl} from '../db/TokenDBImpl';
 
 export class UserDataRepository implements UserRepository {
     private userDB: UserDB;
-    constructor(userDB: UserDB = new UserDBImpl()) {
+    private tokenDB: TokenDB;
+
+    constructor(
+        userDB: UserDB = new UserDBImpl(),
+        tokenDB: TokenDB = new TokenDBImpl()
+    ) {
         this.userDB = userDB;
+        this.tokenDB = tokenDB;
     }
 
     public authenticate(username: string, password: string): Observable<User> {
@@ -45,7 +55,7 @@ export class UserDataRepository implements UserRepository {
     }
 
     private mockAuthenticate(username: string = '', password: string = ''): Observable<UserEntity> {
-        return Observable.create((observer: any) => {
+        return Observable.create(async (observer: any) => {
             if (username === 'root' && password === 'RevoSoft') {
                 let userEntity = new UserEntity();
                 userEntity.setUsername('root');
@@ -54,8 +64,13 @@ export class UserDataRepository implements UserRepository {
                 userEntity.setName('Jhon Doe');
                 userEntity.setCreatedAt(new Date());
                 userEntity.setUpdatedAt(new Date());
-                observer.next(userEntity);
-                observer.complete();
+                try {
+                    await this.tokenDB.setToken(uuid()).toPromise();
+                    observer.next(userEntity);
+                    observer.complete();
+                } catch (e) {
+                    observer.error(new Error(e.message));
+                }
             } else {
                 observer.error(new Error('Invalid credentials'));
             }
