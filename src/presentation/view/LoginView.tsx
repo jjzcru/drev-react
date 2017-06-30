@@ -34,6 +34,7 @@ export class LoginView extends React.Component<any, any> {
             },
             () => {
                 // Here i handle the authentication response to go to dashboard
+                // TODO Make redirect to MainComponent
                 console.log(userModel);
             }));
     }

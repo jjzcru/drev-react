@@ -1,6 +1,8 @@
 import * as React from 'react';
+import {Subscriber} from '@reactivex/rxjs/dist/cjs/Subscriber';
 
 import {Content} from './Content';
+import {DeleteTokenUseCase} from '../../../domain/interactors/DeleteTokenUseCase';
 
 interface NavbarProps {
     nameLabel: string;
@@ -9,7 +11,7 @@ interface NavbarProps {
     logoutLabel?: string;
 
     onClickProfile?: any;
-    onClickLogout?: any;
+    onClickLogout: any;
     onClickHome?: any;
 }
 
@@ -19,8 +21,27 @@ interface SidebarProps {
 }
 
 export class MainComponent extends React.Component<any, undefined> {
+    private deleteTokenUseCase: DeleteTokenUseCase;
+
     constructor(props: any) {
         super(props);
+
+        this.deleteTokenUseCase = new DeleteTokenUseCase();
+
+
+        this.logOut = this.logOut.bind(this);
+    }
+
+    private logOut() {
+        this.deleteTokenUseCase.execute(Subscriber.create(
+            () => {
+            },
+            (err) => console.log(err.message),
+            () => {
+                // Here i handle the authentication response to go to dashboard
+                // TODO Make redirect to login
+                console.log('Hice log out');
+            }));
     }
 
     render() {
@@ -30,11 +51,12 @@ export class MainComponent extends React.Component<any, undefined> {
                     nameLabel='Juan Perez'
                     accountLabel='Cuenta'
                     profileLabel='Perfil'
-                    logoutLabel='Cerrar sesión' />
+                    onClickLogout={this.logOut}
+                    logoutLabel='Cerrar sesión'/>
                 <div className='wrapper row-offcanvas row-offcanvas-left'>
                     <Sidebar
                         nameLabel='Pepe'
-                        greetingLabel='Hey' />
+                        greetingLabel='Hey'/>
                     <Content />
                 </div>
             </div>
@@ -110,7 +132,7 @@ class Navbar extends React.Component<NavbarProps, undefined> {
                                     <a href='#'>
                                         <i className='fa fa-user fa-fw pull-right'/> {this.profileLabel}
                                     </a>
-                                    <a href='#'>
+                                    <a href='#' onClick={this.onClickLogout}>
                                         <i className='fa fa-ban fa-fw pull-right'/> {this.logoutLabel}
                                     </a>
                                 </li>
@@ -126,13 +148,15 @@ class Sidebar extends React.Component<SidebarProps, undefined> {
     constructor(props: SidebarProps) {
         super(props);
     }
+
     render() {
         return (
             <aside className='left-side sidebar-offcanvas'>
                 <section className='sidebar'>
                     <div className='user-panel'>
                         <div className='pull-left image'>
-                            <img src='/src/presentation/assets/img/challenge.jpg' className='img-circle' alt='User Image' />
+                            <img src='/src/presentation/assets/img/challenge.jpg' className='img-circle'
+                                 alt='User Image'/>
                         </div>
                         <div className='pull-left info'>
                             <p>{this.props.greetingLabel}, {this.props.nameLabel}</p>
